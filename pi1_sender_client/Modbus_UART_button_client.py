@@ -46,7 +46,11 @@ def run_button_client():
                     # --- Write to the Modbus Server ---
                     # We write the boolean state to a single coil.
                     # Function: write_coil(address, value, unit=slave_id)
-                    write_response = client.write_coil(COIL_ADDRESS, current_state_pressed, unit=SLAVE_ID)
+                    write_response = client.write_coil(
+                        address=COIL_ADDRESS,
+                        value=current_state_pressed,
+                        slave=SLAVE_ID,
+                    )
 
                     if write_response.isError():
                         print(f"Error writing to server: {write_response}")
