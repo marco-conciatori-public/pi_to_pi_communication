@@ -1,7 +1,6 @@
 import time
 # import logging
 import threading
-import pymodbus
 from pymodbus.server import StartSerialServer
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusSlaveContext, ModbusServerContext
 
@@ -15,6 +14,7 @@ SLAVE_ID = 0x01
 # logging.basicConfig()
 # log = logging.getLogger()
 # log.setLevel(logging.DEBUG)
+
 
 def monitor_datastore_changes(context, slave_id):
     """
