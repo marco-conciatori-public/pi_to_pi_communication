@@ -1,5 +1,4 @@
 import time
-# import logging
 import threading
 from pymodbus.server import StartSerialServer
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusSlaveContext, ModbusServerContext
@@ -9,11 +8,6 @@ SERIAL_PORT = "/dev/ttyAMA0"
 BAUD_RATE = 9600
 # This is the Slave ID for this server
 SLAVE_ID = 0x01
-
-# Optional: configure logging to see detailed Modbus frames
-# logging.basicConfig()
-# log = logging.getLogger()
-# log.setLevel(logging.DEBUG)
 
 
 def monitor_datastore_changes(context, slave_id):
@@ -25,8 +19,6 @@ def monitor_datastore_changes(context, slave_id):
     last_values = []
 
     while True:
-        # Get the block of holding registers for our slave
-        # address=0, count=20 means we read 20 registers starting from address 0
         current_values = context[slave_id].getValues(3, 0, count=20)
 
         if current_values != last_values:
@@ -40,7 +32,8 @@ def monitor_datastore_changes(context, slave_id):
             if display_values:
                 # Convert ASCII values back to a string
                 try:
-                    message = "".join([chr(val) for val in display_values])
+                    # check to ensure value is a valid character
+                    message = "".join([chr(val) for val in display_values if val > 0])
                     print(f"\n--- Data Changed ---")
                     print(f"Received Message: '{message}'")
                     print(f"Register values: {display_values}")
@@ -60,11 +53,11 @@ def run_server():
     # Create the datastore for the server.
     # We create a block of 100 holding registers, all initialized to 0.
     store = ModbusSlaveContext(
-        hr=ModbusSequentialDataBlock(address=0, values=[0] * 100)
+        hr=ModbusSequentialDataBlock(0, [0] * 100)
     )
 
     # Create the server context, mapping the datastore to our slave ID
-    context = ModbusServerContext(store, single=True)
+    context = ModbusServerContext(slaves=store, single=True)
 
     print("Modbus server starting up...")
 

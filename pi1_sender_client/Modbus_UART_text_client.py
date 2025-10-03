@@ -1,5 +1,6 @@
 import time
 from pymodbus.client import ModbusSerialClient
+from pymodbus.exceptions import ConnectionException
 
 # --- Configuration ---
 SERIAL_PORT = "/dev/ttyAMA0"
@@ -45,25 +46,30 @@ def run_client():
             print(f"Message as register values: {register_values}")
 
             # --- Write to the Modbus Server ---
-            # We will write to 'Holding Registers' starting at address 0.
-            # Function: write_registers(address, values, slave_id)
+            # write to 'Holding Registers' starting at address 0.
             try:
-                write_response = client.write_registers(address=0, values=register_values, device_id=SLAVE_ID)
+                # The 'unit' keyword is used for the slave ID
+                write_response = client.write_registers(address=0, values=register_values, slave=SLAVE_ID)
+
+                # We check if the response object itself indicates an error.
                 if write_response.isError():
                     print(f"Error writing to server: {write_response}")
                 else:
                     print(f"Successfully wrote {len(register_values)} registers to Slave {SLAVE_ID}.")
+
+            except ConnectionException:
+                print("Connection to server lost. Please restart client.")
+                break
             except Exception as e:
                 print(f"An error occurred during write: {e}")
-                break # Exit if we lose connection
+                break
 
             time.sleep(1)
 
     except KeyboardInterrupt:
         print("\nClient stopped by user.")
     finally:
-        # Important: always close the connection
-        if client.connected:
+        if client.is_socket_open():
             client.close()
             print("Connection closed.")
 
