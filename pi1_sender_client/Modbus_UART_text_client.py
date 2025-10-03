@@ -63,7 +63,7 @@ def run_client():
         print("\nClient stopped by user.")
     finally:
         # Important: always close the connection
-        if client.is_open:
+        if client.connected:
             client.close()
             print("Connection closed.")
 
