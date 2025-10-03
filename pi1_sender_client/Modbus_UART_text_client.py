@@ -17,7 +17,7 @@ def run_client():
     client = ModbusSerialClient(
         port=SERIAL_PORT,
         baudrate=BAUD_RATE,
-        timeout=1
+        timeout=1,
     )
 
     print("Attempting to connect to Modbus server...")
